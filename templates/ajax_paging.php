@@ -33,14 +33,26 @@ $ajax_request_url .= '&cID=' . $controller->cID;					    // Current page's ID
 
 <script>
 $(document).ready(function() {
-    $('#ajax-pages').html('<img src="<?=$this->getBlockURL()?>/loading.gif" alt="Loading pages..." />').load('<?=$ajax_request_url?>');
+    var ajaxHeight;
+
+    $('#ajax-pages').load('<?=$ajax_request_url?>', function() {
+	ajaxHeight = $('#ajax-article-list').height();
+	$('#ajax-article-list').css('min-height', ajaxHeight).css('opacity',1);
+    });
 
     $('#ajax-paginator a').live('click', function(ev) {
         ev.preventDefault();
         var link_href = $(this).attr('href');
 
-        $('#ajax-pages').html('<img src="<?=$this->getBlockURL()?>/loading.gif" alt="Loading pages..." />').load(link_href);
-
+	$('#ajax-article-list').fadeTo('fast', 0, function() {
+	    $(this).parent().css({
+		'background' : 'url(<?=$this->getBlockURL()?>/loading.gif) 0 0 no-repeat'
+	    });
+	    $('#ajax-pages').load(link_href, function() {
+		$('#ajax-article-list').css('min-height', ajaxHeight).fadeTo('fast',1).parent().css('background', 'none');
+	    });
+	});
+	
         return false;
     });
 });

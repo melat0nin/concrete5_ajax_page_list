@@ -105,11 +105,13 @@ if ($pl->getSummary()->pages > 1) {	// Retrieve pagination links ready for displ
  */
 $pages = $pl->getPage($current_page);
 
+echo '<div id="ajax-article-list" style="opacity: 0">';
 foreach ($pages as $page) {
   echo '<article>';
   echo '<a href="' . $nh->getLinkToCollection($page) . '">' . htmlentities($page->getCollectionName()) . '</a>';  
   echo '</article>';
 }
+echo '</div>';
 
 if ( !empty($paginator_links) ) {   // Output pagination
     echo '<div id="ajax-paginator" class="pagination">';
