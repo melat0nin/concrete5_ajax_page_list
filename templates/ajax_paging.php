@@ -3,7 +3,7 @@ defined('C5_EXECUTE') or die("Access Denied.");
 
 // Vars
 $c_id = Page::getCurrentPage()->getCollectionID();
-$rssUrl = $showRss ? $controller->getRssUrl($b) : '';
+$rssUrl = $controller->rss ? $controller->getRssUrl($b) : '';
 
 // Helpers
 $th = Loader::helper('text');
@@ -19,20 +19,28 @@ $ajax_request_url = $block_tools_dir . '/ajax_request';
 $ajax_request_url .= '?bID=' . $controller->bID;			    // # of results per page
 $ajax_request_url .= '&num=' . $controller->num;			    // # of results per page
 $ajax_request_url .= '&cParentID=' . $controller->cParentID;		    // Parent page ID
-$ajax_request_url .= '&cThis=' . $controller->cThis;			    // Filter beneath this page
+$ajax_request_url .= '&cThis=' . $controller->cThis;			    // Filter beneath this page boolean
 $ajax_request_url .= '&orderBy=' . $controller->orderBy;		    // Order results
 $ajax_request_url .= '&ctID=' . $controller->ctID;			    // Page type ID
-//$ajax_request_url .= '&rss=' . $controller->rss;			    // RSS
-$ajax_request_url .= '&displayAliases=' . $controller->displayAliases;	    // Display aliases
-$ajax_request_url .= '&displayFeaturedOnly=' . $controller->displayFeaturedOnly;	    // Display aliases
+$ajax_request_url .= '&displayAliases=' . $controller->displayAliases;	    // Display aliases boolean
+$ajax_request_url .= '&displayFeaturedOnly=' . $controller->displayFeaturedOnly;	    // Display is_featured pages only boolean
 $ajax_request_url .= '&cID=' . $controller->cID;					    // Current page's ID
-$ajax_request_url .= '&truncateSummaries=' . $controller->truncateSummaries;		    // Truncate page descriptions
+$ajax_request_url .= '&truncateSummaries=' . $controller->truncateSummaries;		    // Truncate page descriptions boolean
 $ajax_request_url .= '&truncateChars=' . $controller->truncateChars;		    // # of description chars to display
 
 ?>
 
 <div class="ccm-page-list">
+
     <div id="ajax-pages"></div>
+
+    <?php  if ($controller->rss): ?>
+	    <div class="ccm-page-list-rss-icon">
+		<a href="<?php  echo $rssUrl ?>" target="_blank"><img src="<?php  echo $rssIconSrc ?>" width="14" height="14" alt="<?php  echo t('RSS Icon') ?>" title="<?php  echo t('RSS Feed') ?>" /></a>
+	    </div>
+	    <link href="<?php  echo BASE_URL.$rssUrl ?>" rel="alternate" type="application/rss+xml" title="<?php  echo $controller->rssTitle; ?>" />
+    <?php  endif; ?>
+
 </div>
 
 <script>
