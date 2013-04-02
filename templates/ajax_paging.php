@@ -3,6 +3,7 @@ defined('C5_EXECUTE') or die("Access Denied.");
 
 // Vars
 $c_id = Page::getCurrentPage()->getCollectionID();
+$rssUrl = $showRss ? $controller->getRssUrl($b) : '';
 
 // Helpers
 $th = Loader::helper('text');
@@ -25,6 +26,9 @@ $ajax_request_url .= '&ctID=' . $controller->ctID;			    // Page type ID
 $ajax_request_url .= '&displayAliases=' . $controller->displayAliases;	    // Display aliases
 $ajax_request_url .= '&displayFeaturedOnly=' . $controller->displayFeaturedOnly;	    // Display aliases
 $ajax_request_url .= '&cID=' . $controller->cID;					    // Current page's ID
+$ajax_request_url .= '&truncateSummaries=' . $controller->truncateSummaries;		    // Truncate page descriptions
+$ajax_request_url .= '&truncateChars=' . $controller->truncateChars;		    // # of description chars to display
+
 ?>
 
 <div class="ccm-page-list">
