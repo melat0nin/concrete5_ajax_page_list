@@ -62,7 +62,7 @@ if ($row['displayFeaturedOnly'] == 1) {
 if (!$row['displayAliases']) {
     $pl->filterByIsAlias(0);
 }
-$pl->filter('cvName', '', '!=');
+$pl->filter('cvName', '', '!=');	// Presume this removes any unpublished page versions/page versions with no name?
 
 // Filter by page type ID
 if ($row['ctID']) {
@@ -92,17 +92,17 @@ if ( intval($row['cParentID']) != 0) {
 $num = (int) $row['num'];
 $pl->setItemsPerPage($num);
 $current_page_get_var = 'ccm_paging_p_b' . $bID;
-$current_page = intval( $_GET[$current_page_get_var] );		// Requested page of results
-$current_page = empty($current_page) ? 1 : $current_page;	// Paginator returns this page of results
+$current_page = intval( $_GET[$current_page_get_var] );		// Page of results requested in query string
+$current_page = empty($current_page) ? 1 : $current_page;	// PageList object returns this page of results
 
 /*
  * Retrieve and output pages and pagination
  */
 $pages = $pl->getPage($current_page);
 
-echo '<div id="ajax-article-list" style="opacity: 0">';
+echo '<div id="ajax-article-list" style="opacity: 0">';		// List opacity set to 0 for default jQuery fade animation set in ajax_page_list custom template
 
-foreach ($pages as $page) {
+foreach ($pages as $page) :
     // Prepare data for each page being listed...
     $title = $th->entities($page->getCollectionName());
     $url = $nh->getLinkToCollection($page);
@@ -150,7 +150,7 @@ foreach ($pages as $page) {
     </div>
 
 <?php
-}
+endforeach;
 
 echo '</div>'; // Close #ajax-article-list
 
