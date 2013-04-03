@@ -1,4 +1,4 @@
-<?php 
+<?php
 defined('C5_EXECUTE') or die("Access Denied.");
 
 // Helpers
@@ -50,7 +50,7 @@ switch($row['orderBy']) {
 }
 
 // Filter by is_featured attribute
-if ($row['displayFeaturedOnly'] == 1) {	    
+if ($row['displayFeaturedOnly'] == 1) {
     Loader::model('attribute/categories/collection');
     $cak = CollectionAttributeKey::getByHandle('is_featured');
     if (is_object($cak)) {
@@ -59,18 +59,18 @@ if ($row['displayFeaturedOnly'] == 1) {
 }
 
 // Display page aliases
-if (!$row['displayAliases']) {	    
+if (!$row['displayAliases']) {
     $pl->filterByIsAlias(0);
 }
 $pl->filter('cvName', '', '!=');
 
 // Filter by page type ID
-if ($row['ctID']) {	
+if ($row['ctID']) {
     $pl->filterByCollectionTypeID($row['ctID']);
 }
 
 // Filter by exclude from page list
-$columns = $db->MetaColumns(CollectionAttributeKey::getIndexedSearchTable());	
+$columns = $db->MetaColumns(CollectionAttributeKey::getIndexedSearchTable());
 if (isset($columns['AK_EXCLUDE_PAGE_LIST'])) {
     $pl->filter(false, '(ak_exclude_page_list = 0 or ak_exclude_page_list is null)');
 }
@@ -94,11 +94,6 @@ $pl->setItemsPerPage($num);
 $current_page_get_var = 'ccm_paging_p_b' . $bID;
 $current_page = intval( $_GET[$current_page_get_var] );		// Requested page of results
 $current_page = empty($current_page) ? 1 : $current_page;	// Paginator returns this page of results
-
-if ($pl->getSummary()->pages > 1) {	// Retrieve pagination links ready for display
-    $paginator = $pl->getPagination();
-    $paginator_links = $paginator->getPages();
-}
 
 /*
  * Retrieve and output pages and pagination
@@ -160,9 +155,9 @@ foreach ($pages as $page) {
 echo '</div>'; // Close #ajax-article-list
 
 // Output pagination
-if ( !empty($paginator_links) ) {   
+if ( $pl->getSummary()->pages > 1 ) {
     echo '<div id="ajax-paginator" class="pagination">';
-    echo $paginator_links;
+    $pl->displayPaging();
     echo '</div>';
 }
 
