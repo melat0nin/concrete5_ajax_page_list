@@ -7,7 +7,6 @@ $rssUrl = $controller->rss ? $controller->getRssUrl($b) : '';
 
 // Helpers
 $uh = Loader::helper('concrete/urls');
-$th = Loader::helper('text');
 
 // Get block tools URL for ajax request script
 $ajax_request_url = $uh->getToolsURL('ajax_request', 'ajax_page_list');
