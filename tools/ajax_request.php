@@ -87,7 +87,7 @@ if ( intval($row['cParentID']) != 0) {
 }
 
 /*
- *  Set up pagination
+ *  Set up pagination and retrieve pages
  */
 $paginate_list = $row['paginate'];
 $num = (int) $row['num'];
@@ -100,10 +100,6 @@ if ( $paginate_list == 1 ) {
 } else {
     $pages = $pl->getPage(1);
 }
-/*
- * Retrieve and output pages and pagination
- */
-
 
 echo '<div id="ajax-article-list" style="opacity: 0">';		// List opacity set to 0 for default jQuery fade animation set in ajax_page_list custom template
 
