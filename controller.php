@@ -5,7 +5,7 @@ class AjaxPageListPackage extends Package {
 	
 	protected $pkgHandle = 'ajax_page_list';
 	protected $appVersionRequired = '5.5';
-	protected $pkgVersion = '1.0';
+	protected $pkgVersion = '0.9.0';
 	
 	public function getPackageName() {
 		return t('Ajax Page List'); 
