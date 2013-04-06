@@ -64,7 +64,7 @@ $(document).ready(function() {
 
 	$('#ajax-article-list').fadeTo('fast', 0, function() {
 	    $(this).parent().css({
-		'background' : 'url(<?=DIR_REL?>/packages/ajax_page_list/loading.gif) 20px 20px no-repeat'
+		'background' : 'url(<?=DIR_REL?>/packages/ajax_page_list/loading.gif) 0 0 no-repeat'
 	    });
 	    $('#ajax-pages').load(link_href, function() {
 		$('#ajax-article-list').css('min-height', ajaxHeight).fadeTo('fast',1).parent().css('background', 'none');
