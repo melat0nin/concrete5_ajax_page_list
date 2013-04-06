@@ -26,6 +26,7 @@ $ajax_request_url .= '&displayFeaturedOnly=' . $controller->displayFeaturedOnly;
 $ajax_request_url .= '&cID=' . $controller->cID;					    // Current page's ID
 $ajax_request_url .= '&truncateSummaries=' . $controller->truncateSummaries;		    // Truncate page descriptions boolean
 $ajax_request_url .= '&truncateChars=' . $controller->truncateChars;		    // # of description chars to display
+$ajax_request_url .= '&paginate=' . $controller->paginate;		    // Whether to paginate or not
 
 ?>
 
@@ -63,7 +64,7 @@ $(document).ready(function() {
 
 	$('#ajax-article-list').fadeTo('fast', 0, function() {
 	    $(this).parent().css({
-		'background' : 'url(<?=DIR_REL?>/packages/ajax_page_list/loading.gif) 0 0 no-repeat'
+		'background' : 'url(<?=DIR_REL?>/packages/ajax_page_list/loading.gif) 20px 20px no-repeat'
 	    });
 	    $('#ajax-pages').load(link_href, function() {
 		$('#ajax-article-list').css('min-height', ajaxHeight).fadeTo('fast',1).parent().css('background', 'none');

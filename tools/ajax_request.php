@@ -10,7 +10,7 @@ Loader::model('page_list');
 $db = Loader::db();
 $bID = $_GET['bID'];
 if ($bID) {
-    $q = "select num, cParentID, cThis, orderBy, ctID, displayAliases, rss, displayFeaturedOnly, includeAllDescendents, truncateSummaries, truncateChars from btPageList where bID = '$bID'";
+    $q = "select num, cParentID, cThis, orderBy, ctID, displayAliases, rss, displayFeaturedOnly, includeAllDescendents, truncateSummaries, truncateChars, paginate from btPageList where bID = '$bID'";
     $r = $db->query($q);
     if ($r) {
 	$row = $r->fetchRow();
@@ -89,16 +89,21 @@ if ( intval($row['cParentID']) != 0) {
 /*
  *  Set up pagination
  */
+$paginate_list = $row['paginate'];
 $num = (int) $row['num'];
 $pl->setItemsPerPage($num);
-$current_page_get_var = 'ccm_paging_p_b' . $bID;
-$current_page = intval( $_GET[$current_page_get_var] );		// Page of results requested in query string
-$current_page = empty($current_page) ? 1 : $current_page;	// PageList object returns this page of results
-
+if ( $paginate_list == 1 ) {
+    $current_page_get_var = 'ccm_paging_p_b' . $bID;
+    $current_page = intval( $_GET[$current_page_get_var] );		// Page of results requested in query string
+    $current_page = empty($current_page) ? 1 : $current_page;	// PageList object returns this page of results
+    $pages = $pl->getPage($current_page);
+} else {
+    $pages = $pl->getPage(1);
+}
 /*
  * Retrieve and output pages and pagination
  */
-$pages = $pl->getPage($current_page);
+
 
 echo '<div id="ajax-article-list" style="opacity: 0">';		// List opacity set to 0 for default jQuery fade animation set in ajax_page_list custom template
 
@@ -155,7 +160,7 @@ endforeach;
 echo '</div>'; // Close #ajax-article-list
 
 // Output pagination
-if ( $pl->getSummary()->pages > 1 ) {
+if ( $paginate_list ) {
     echo '<div id="ajax-paginator" class="pagination">';
     $pl->displayPaging();
     echo '</div>';
