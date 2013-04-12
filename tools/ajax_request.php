@@ -16,6 +16,8 @@ if ($bID) {
 	$row = $r->fetchRow();
     }
     $row['cID'] = $_GET['cID'];
+    $row['filterAttribute'] = $_GET['filterAttribute'];
+    $row['filterVal'] = $_GET['filterVal'];
 } else {
     $row = $_GET;
 }
@@ -84,6 +86,11 @@ if ( intval($row['cParentID']) != 0) {
     } else {
 	$pl->filterByParentID($cParentID);
     }
+}
+
+// Filter by select attribute
+if ( !empty($row['filterAttribute']) && !empty($row['filterVal']) ) {
+    $pl->filter(false, "(ak_{$row['filterAttribute']} LIKE '%\n{$row['filterVal']}\n%')");
 }
 
 /*
