@@ -16,7 +16,7 @@ if ($bID) {
 	$row = $r->fetchRow();
     }
     $row['cID'] = $_GET['cID'];
-    $row['filterAttribute'] = $_GET['filterAttribute'];
+    $row['filterAttributes'] = $_GET['filterAttributes'];
     $row['filterVal'] = $_GET['filterVal'];
 } else {
     $row = $_GET;
@@ -89,8 +89,8 @@ if ( intval($row['cParentID']) != 0) {
 }
 
 // Filter by select attribute
-if ( !empty($row['filterAttribute']) && !empty($row['filterVal']) ) {
-    $pl->filter(false, "(ak_{$row['filterAttribute']} LIKE '%\n{$row['filterVal']}\n%')");
+if ( count($row['filterAttributes']) > 0 && !empty($row['filterVal']) ) {
+    $pl->filter(false, "(ak_{$row['filterAttributes'][0]} LIKE '%\n{$row['filterVal']}\n%')");
 }
 
 /*
@@ -107,6 +107,41 @@ if ( $paginate_list == 1 ) {
 } else {
     $pages = $pl->getPage(1);
 }
+
+// Display attribute filter links
+if ( count($row['filterAttributes']) > 0 ) {
+    Loader::model('attribute/categories/collection');
+    $satc = new SelectAttributeTypeController(AttributeType::getByHandle('select'));
+
+    // Process request URL and remove current filter
+    $request = $_SERVER['REQUEST_URI'];
+    $parts = parse_url($request);
+    $params = array();
+    parse_str($parts['query'], $params);
+    unset($params['filterAttributes']);
+    $query_string = http_build_query($params);
+    $unfiltered_url = $parts['path'] . '?' . $query_string;
+
+
+    //echo $get_string;
+
+
+    foreach ($row['filterAttributes'] as $attribute_handle) {
+	$ak = CollectionAttributeKey::getByHandle($attribute_handle);
+	$satc->setAttributeKey($ak);
+	$options = $satc->getOptions();
+	if( count($options) > 0) {
+	   echo $ak->getAttributeKeyName();
+	   echo '<ul class="page-list-filter">';
+	   foreach($options as $opt) {
+	      echo '<li><a href="javascript:;" data-href="' . $unfiltered_url .'&filterAttributes[]=' . $attribute_handle . '&filterVal=' . $opt . '">' . $opt . '</a></li>';
+	   }
+	   echo '</ul>';
+	}
+    }
+}
+
+print_r($row);
 
 echo '<div id="ajax-article-list" style="opacity: 0">';		// List opacity set to 0 for default jQuery fade animation set in ajax_page_list custom template
 

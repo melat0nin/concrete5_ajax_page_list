@@ -1,6 +1,17 @@
 <?php
 defined('C5_EXECUTE') or die("Access Denied.");
 
+/***********
+ * Filter by attribute
+ * -------------------
+ *
+ * Enter the handles for select page attributes you'd like to filter by below and these
+ * will be displayed above the Page List, e.g.
+ * $filter_attributes = array("my_attribute_1", "my_attribute_2");
+ */
+$filter_attributes = array('colour');
+
+
 // Vars
 $c_id = Page::getCurrentPage()->getCollectionID();
 $rssUrl = $controller->rss ? $controller->getRssUrl($b) : '';
@@ -27,6 +38,12 @@ $ajax_request_url .= '&truncateSummaries=' . $controller->truncateSummaries;		  
 $ajax_request_url .= '&truncateChars=' . $controller->truncateChars;		    // # of description chars to display
 $ajax_request_url .= '&paginate=' . $controller->paginate;		    // Whether to paginate or not
 
+// Custom select filters
+if ( count($filter_attributes) > 0 ) {
+    foreach ($filter_attributes as $handle) {
+	$ajax_request_url .= '&filterAttributes[]=' . $handle;
+    }
+}
 ?>
 
 <div class="ccm-page-list">
@@ -57,7 +74,7 @@ $(document).ready(function() {
 	});
     });
 
-    $('#ajax-paginator a').live('click', function(ev) {
+    $('#ajax-paginator a, .page-list-filter a').live('click', function(ev) {
 	ev.preventDefault();
 	var link_href = $(this).attr('data-href');
 
