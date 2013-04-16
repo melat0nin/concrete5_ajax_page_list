@@ -16,6 +16,8 @@ if ($bID) {
 	$row = $r->fetchRow();
     }
     $row['cID'] = $_GET['cID'];
+    $row['displayAttributes'] = $_GET['displayAttributes'];
+    $row['filterAttributes'] = $_GET['filterAttributes'];
 } else {
     $row = $_GET;
 }
@@ -86,6 +88,14 @@ if ( intval($row['cParentID']) != 0) {
     }
 }
 
+// Filter by select attribute
+if ( count($row['filterAttributes']) > 0 ) {
+    foreach ($row['filterAttributes'] as $attribute=>$value) {
+	if (!empty($value))
+	    $pl->filter(false, "(ak_{$attribute} LIKE '%\n{$value}\n%')");
+    }
+}
+
 /*
  *  Set up pagination and retrieve pages
  */
@@ -101,57 +111,122 @@ if ( $paginate_list == 1 ) {
     $pages = $pl->getPage(1);
 }
 
+// Display attribute filter links
+if ( count($row['displayAttributes']) > 0 ) {
+    Loader::model('attribute/categories/collection');
+    $satc = new SelectAttributeTypeController(AttributeType::getByHandle('select'));
+
+    // Get existing query string to pass through filtering parameters
+    $request = $_SERVER['REQUEST_URI'];
+    $url_parts = parse_url($request);
+    $url_params = array();
+    parse_str($url_parts['query'], $url_params);
+    $query_string = http_build_query($url_params);
+    
+    // Display select attributes (and their options) specified in ajax_page_list.php as lists of links
+    echo '<div class="page-list-filters">';
+    echo '<p><strong>' . t('Filter by:') . '</strong></p>';
+    
+    foreach ($row['displayAttributes'] as $attribute_handle) :
+
+	$ak = CollectionAttributeKey::getByHandle($attribute_handle);
+	$satc->setAttributeKey($ak);
+	$options = $satc->getOptions();
+
+	if( count($options) > 0) {
+
+	    echo '<div class="page-list-filter">';
+	    echo $ak->getAttributeKeyName();
+	    echo '<ul>';
+
+	    foreach($options as $opt) {
+		$class = '';
+
+		// Create parameters for attribute links to be toggled,
+		// and apply 'active' class to active filters
+		if ( $row['filterAttributes'][$attribute_handle] == $opt ) {
+		    $class = 'active';
+		    $additional_params = '&filterAttributes[' . $attribute_handle . ']=';
+		} else {
+		    $additional_params = '&filterAttributes[' . $attribute_handle . ']=' . $opt;
+		}
+		
+		echo '<li><a href="javascript:;" class="' . $class . '" data-href="' . $url_parts['path'] . '?' . $query_string . $additional_params . '">' . $opt . '</a></li>';
+
+	    }
+	    
+	    echo '</ul>';
+	    echo '</div>';
+
+	}
+    endforeach;
+
+    echo '<div class="clear"></div>';
+    echo '</div>';
+
+}
+
+
+
 echo '<div id="ajax-article-list" style="opacity: 0">';		// List opacity set to 0 for default jQuery fade animation set in ajax_page_list custom template
 
-foreach ($pages as $page) :
-    // Prepare data for each page being listed...
-    $title = $th->entities($page->getCollectionName());
-    $url = $nh->getLinkToCollection($page);
-    $target = ($page->getCollectionPointerExternalLink() != '' && $page->openCollectionPointerExternalLinkInNewWindow()) ? '_blank' : $page->getAttribute('nav_target');
-    $target = empty($target) ? '_self' : $target;
-    $description = $page->getCollectionDescription();
-    $description = $row['truncateSummaries'] ? $th->shorten($description, $row['truncateChars']) : $description;
-    $description = $th->entities($description);
+if ( count($pages) > 0 ) {
+    
+    foreach ($pages as $page) :
+	// Prepare data for each page being listed...
+	$title = $th->entities($page->getCollectionName());
+	$url = $nh->getLinkToCollection($page);
+	$target = ($page->getCollectionPointerExternalLink() != '' && $page->openCollectionPointerExternalLinkInNewWindow()) ? '_blank' : $page->getAttribute('nav_target');
+	$target = empty($target) ? '_self' : $target;
+	$description = $page->getCollectionDescription();
+	$description = $row['truncateSummaries'] ? $th->shorten($description, $row['truncateChars']) : $description;
+	$description = $th->entities($description);
 
-    //Other useful page data...
-    //$date = date('F j, Y', strtotime($page->getCollectionDatePublic()));
-    //$last_edited_by = $page->getVersionObject()->getVersionAuthorUserName();
-    //$original_author = Page::getByID($page->getCollectionID(), 1)->getVersionObject()->getVersionAuthorUserName();
+	//Other useful page data...
+	//$date = date('F j, Y', strtotime($page->getCollectionDatePublic()));
+	//$last_edited_by = $page->getVersionObject()->getVersionAuthorUserName();
+	//$original_author = Page::getByID($page->getCollectionID(), 1)->getVersionObject()->getVersionAuthorUserName();
 
-    /* CUSTOM ATTRIBUTE EXAMPLES:
-     * $example_value = $page->getAttribute('example_attribute_handle');
-     *
-     * HOW TO USE IMAGE ATTRIBUTES:
-     * 1) Uncomment the "$ih = Loader::helper('image');" line up top.
-     * 2) Put in some code here like the following 2 lines:
-     *      $img = $page->getAttribute('example_image_attribute_handle');
-     *      $thumb = $ih->getThumbnail($img, 64, 9999, false);
-     *    (Replace "64" with max width, "9999" with max height. The "9999" effectively means "no maximum size" for that particular dimension.)
-     *    (Change the last argument from false to true if you want thumbnails cropped.)
-     * 3) Output the image tag below like this:
-     *		<img src="<?php  echo $thumb->src ?>" width="<?php  echo $thumb->width ?>" height="<?php  echo $thumb->height ?>" alt="" />
-     *
-     * ~OR~ IF YOU DO NOT WANT IMAGES TO BE RESIZED:
-     * 1) Put in some code here like the following 2 lines:
-     * 	    $img_src = $img->getRelativePath();
-     * 	    list($img_width, $img_height) = getimagesize($img->getPath());
-     * 2) Output the image tag below like this:
-     * 	    <img src="<?php  echo $img_src ?>" width="<?php  echo $img_width ?>" height="<?php  echo $img_height ?>" alt="" />
-     */
+	/* CUSTOM ATTRIBUTE EXAMPLES:
+	 * $example_value = $page->getAttribute('example_attribute_handle');
+	 *
+	 * HOW TO USE IMAGE ATTRIBUTES:
+	 * 1) Uncomment the "$ih = Loader::helper('image');" line up top.
+	 * 2) Put in some code here like the following 2 lines:
+	 *      $img = $page->getAttribute('example_image_attribute_handle');
+	 *      $thumb = $ih->getThumbnail($img, 64, 9999, false);
+	 *    (Replace "64" with max width, "9999" with max height. The "9999" effectively means "no maximum size" for that particular dimension.)
+	 *    (Change the last argument from false to true if you want thumbnails cropped.)
+	 * 3) Output the image tag below like this:
+	 *		<img src="<?php  echo $thumb->src ?>" width="<?php  echo $thumb->width ?>" height="<?php  echo $thumb->height ?>" alt="" />
+	 *
+	 * ~OR~ IF YOU DO NOT WANT IMAGES TO BE RESIZED:
+	 * 1) Put in some code here like the following 2 lines:
+	 * 	    $img_src = $img->getRelativePath();
+	 * 	    list($img_width, $img_height) = getimagesize($img->getPath());
+	 * 2) Output the image tag below like this:
+	 * 	    <img src="<?php  echo $img_src ?>" width="<?php  echo $img_width ?>" height="<?php  echo $img_height ?>" alt="" />
+	 */
 
-    /* End data preparation. */
+	/* End data preparation. */
 
-    /* The HTML from here through "endforeach" is repeated for every item in the list... */ ?>
+	/* The HTML from here through "endforeach" is repeated for every item in the list... */ ?>
 
-    <h3 class="ccm-page-list-title">
-	<a href="<?php  echo $url ?>" target="<?php  echo $target ?>"><?php  echo $title ?></a>
-    </h3>
-    <div class="ccm-page-list-description">
-	<?php  echo $description ?>
-    </div>
+	<h3 class="ccm-page-list-title">
+	    <a href="<?php  echo $url ?>" target="<?php  echo $target ?>"><?php  echo $title ?></a>
+	</h3>
+	<div class="ccm-page-list-description">
+	    <?php  echo $description ?>
+	</div>
 
-<?php
-endforeach;
+    <?php
+    endforeach;
+
+} else {
+
+    echo t('No pages found!');
+
+}
 
 echo '</div>'; // Close #ajax-article-list
 
