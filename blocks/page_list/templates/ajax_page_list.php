@@ -1,15 +1,15 @@
 <?php
 defined('C5_EXECUTE') or die("Access Denied.");
 
-/***********
+/**
  * Filter by attribute
  * -------------------
  *
  * Enter the handles for select page attributes you'd like to filter by below and these
- * will be displayed above the Page List, e.g.
- * $filter_attributes = array("my_attribute_1", "my_attribute_2");
- */
-$filter_attributes = array('colour');
+ * will be displayed above the Page List as a list of links which can be clicked to apply filters
+ * e.g. $filter_attributes = array("my_attribute_1", "my_attribute_2");
+ **/
+$filter_attributes = array();
 
 
 // Vars
@@ -63,15 +63,16 @@ if ( count($filter_attributes) > 0 ) {
 $(document).ready(function() {
     var ajaxHeight;
 
-    $('#ajax-pages').load('<?php echo $ajax_request_url ?>', function() {
-	ajaxHeight = $('#ajax-article-list').height();
-	$('#ajax-article-list').css('min-height', ajaxHeight).css('opacity',1);
-	$('#ajax-paginator a').each(function() {
-	    $(this).attr({
-		'data-href' : $(this).attr('href'),
-		'href' : 'javascript:;'
+    $('#ajax-pages')
+	.load('<?php echo $ajax_request_url ?>', function() {
+	    ajaxHeight = $('#ajax-article-list').height();
+	    $('#ajax-article-list').css('min-height', ajaxHeight).css('opacity',1);
+	    $('#ajax-paginator a').each(function() {
+		$(this).attr({
+		    'data-href' : $(this).attr('href'),
+		    'href' : 'javascript:;'
+		});
 	    });
-	});
     });
 
     $('#ajax-paginator a, .page-list-filter a').live('click', function(ev) {
@@ -79,9 +80,7 @@ $(document).ready(function() {
 	var link_href = $(this).attr('data-href');
 
 	$('#ajax-article-list').fadeTo('fast', 0, function() {
-	    $(this).parent().css({
-		'background' : 'url(<?php echo DIR_REL ?>/packages/ajax_page_list/loading.gif) 0 0 no-repeat'
-	    });
+	    $('.page-list-filters').css({'background': 'url(<?php echo DIR_REL ?>/packages/ajax_page_list/loading.gif) 0 bottom no-repeat'});
 	    $('#ajax-pages').load(link_href, function() {
 		$('#ajax-article-list').css('min-height', ajaxHeight).fadeTo('fast',1).parent().css('background', 'none');
 		$('#ajax-paginator a').each(function() {

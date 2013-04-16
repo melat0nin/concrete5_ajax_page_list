@@ -1,1 +1,23 @@
-/* Necessary to prevent 404 error -- see concrete5 bug at http://www.concrete5.org/developers/bugs/5-6-1/404-when-using-custom-template-for-page-list-block/ */
+.page-list-filters {
+    padding-bottom: 32px;
+}
+
+.page-list-filters .clear {
+    clear: both;
+}
+
+.page-list-filter {
+    float: left;
+    min-width: 150px;
+}
+
+.page-list-filter a.active {
+    padding: 5px 10px;
+    background: #000;
+    border-radius: 5px;
+    color: white !important;
+}
+
+#ajax-article-list {
+    clear: both;
+}
