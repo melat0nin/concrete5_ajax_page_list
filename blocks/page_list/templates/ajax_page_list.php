@@ -41,7 +41,7 @@ $ajax_request_url .= '&paginate=' . $controller->paginate;		    // Whether to pa
 // Custom select filters
 if ( count($filter_attributes) > 0 ) {
     foreach ($filter_attributes as $handle) {
-	$ajax_request_url .= '&filterAttributes[]=' . $handle;
+	$ajax_request_url .= '&displayAttributes[]=' . $handle;
     }
 }
 ?>

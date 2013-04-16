@@ -16,8 +16,8 @@ if ($bID) {
 	$row = $r->fetchRow();
     }
     $row['cID'] = $_GET['cID'];
+    $row['displayAttributes'] = $_GET['displayAttributes'];
     $row['filterAttributes'] = $_GET['filterAttributes'];
-    $row['filterVal'] = $_GET['filterVal'];
 } else {
     $row = $_GET;
 }
@@ -89,8 +89,10 @@ if ( intval($row['cParentID']) != 0) {
 }
 
 // Filter by select attribute
-if ( count($row['filterAttributes']) > 0 && !empty($row['filterVal']) ) {
-    $pl->filter(false, "(ak_{$row['filterAttributes'][0]} LIKE '%\n{$row['filterVal']}\n%')");
+if ( count($row['filterAttributes']) > 0 ) {
+    foreach ($row['filterAttributes'] as $attribute=>$value) {
+	$pl->filter(false, "(ak_{$attribute} LIKE '%\n{$value}\n%')");
+    }
 }
 
 /*
@@ -109,7 +111,7 @@ if ( $paginate_list == 1 ) {
 }
 
 // Display attribute filter links
-if ( count($row['filterAttributes']) > 0 ) {
+if ( count($row['displayAttributes']) > 0 ) {
     Loader::model('attribute/categories/collection');
     $satc = new SelectAttributeTypeController(AttributeType::getByHandle('select'));
 
@@ -118,7 +120,7 @@ if ( count($row['filterAttributes']) > 0 ) {
     $parts = parse_url($request);
     $params = array();
     parse_str($parts['query'], $params);
-    unset($params['filterAttributes']);
+    //unset($params['displayAttributes']);
     $query_string = http_build_query($params);
     $unfiltered_url = $parts['path'] . '?' . $query_string;
 
@@ -126,17 +128,19 @@ if ( count($row['filterAttributes']) > 0 ) {
     //echo $get_string;
 
 
-    foreach ($row['filterAttributes'] as $attribute_handle) {
+    foreach ($row['displayAttributes'] as $attribute_handle) {
 	$ak = CollectionAttributeKey::getByHandle($attribute_handle);
 	$satc->setAttributeKey($ak);
 	$options = $satc->getOptions();
 	if( count($options) > 0) {
-	   echo $ak->getAttributeKeyName();
-	   echo '<ul class="page-list-filter">';
-	   foreach($options as $opt) {
-	      echo '<li><a href="javascript:;" data-href="' . $unfiltered_url .'&filterAttributes[]=' . $attribute_handle . '&filterVal=' . $opt . '">' . $opt . '</a></li>';
-	   }
-	   echo '</ul>';
+	    echo $ak->getAttributeKeyName();
+	    echo '<ul class="page-list-filter">';
+	    $class = '';
+	    foreach($options as $opt) {
+		if ( (string)$row['filterAttributes'][$attribute_handle] === (string)$opt) $class = 'active';
+		echo '<li><a href="javascript:;" class="' . $class . '" data-href="' . $unfiltered_url .'&filterAttributes[' . $attribute_handle . ']=' . $opt . '">' . $opt . '</a></li>';
+	    }
+	    echo '</ul>';
 	}
     }
 }
