@@ -24,7 +24,7 @@ Installation
 Filtering by custom select attributes
 -------------------------------------
 
-No configuration beyond the above is required to render and paginate the Page List (this is the default behaviour). concrete5's Page List objects are powerful things though, and sometimes we want to filter them using custom select attributes.
+No configuration beyond the above is required to render and paginate the Page List using AJAX (this is the default behaviour). concrete5's Page List objects are powerful things though, and sometimes we want to filter them using custom select attributes.
 
 To enable filtering by custom select attributes:
 
