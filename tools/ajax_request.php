@@ -91,10 +91,18 @@ if ( intval($row['cParentID']) != 0) {
 // Filter by select attribute
 if ( count($row['filterAttributes']) > 0 ) {
     foreach ($row['filterAttributes'] as $attribute=>$value) {
-	if (!empty($value))
-	    $pl->filter(false, "(ak_{$attribute} LIKE '%\n{$value}\n%')");
-    }
+    	if (!empty($value))
+          $cat = explode(",", $value);
+          $value1 = $cat[0];
+          $value2 = $cat[1];
+          if (!empty($value2)) {
+           $pl->filter(false, "(ak_{$attribute} LIKE '%\n{$value1}\n%') OR (ak_{$attribute} LIKE '%\n{$value2}\n%')");
+          } else {
+           $pl->filter(false, "(ak_{$attribute} LIKE '%\n{$value1}\n%')");
+        }
+  }
 }
+
 
 /*
  *  Set up pagination and retrieve pages
