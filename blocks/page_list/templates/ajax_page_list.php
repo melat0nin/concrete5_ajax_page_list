@@ -77,8 +77,13 @@ $(document).ready(function() {
 
     $('#ajax-paginator a, .page-list-filter a').live('click', function(ev) {
 	ev.preventDefault();
+	
+	//if category is already selected don't load again // return
+	if($(this).hasClass('selected') ){
+		return;
+	}
 	var link_href = $(this).attr('data-href').replace(/\s/g,"%20");
-
+	
 	$('#ajax-article-list').fadeTo('fast', 0, function() {
 	    $('.page-list-filters').css({'background': 'url(<?php echo DIR_REL ?>/packages/ajax_page_list/loading.gif) 0 bottom no-repeat'});
 	    $('#ajax-pages').load(link_href, function() {
