@@ -10,8 +10,8 @@ Loader::model('page_list');
 $db = Loader::db();
 $bID = $_GET['bID'];
 if ($bID) {
-    $q = "select num, cParentID, cThis, orderBy, ctID, displayAliases, rss, displayFeaturedOnly, includeAllDescendents, truncateSummaries, truncateChars, paginate from btPageList where bID = '$bID'";
-    $r = $db->query($q);
+    $q = "select num, cParentID, cThis, orderBy, ctID, displayAliases, rss, displayFeaturedOnly, includeAllDescendents, truncateSummaries, truncateChars, paginate from btPageList where bID = ?";
+    $r = $db->query($q, array($bID));
     if ($r) {
 	$row = $r->fetchRow();
     }
